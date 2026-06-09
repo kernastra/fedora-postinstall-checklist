@@ -1,0 +1,180 @@
+{
+  "groups": [
+    {
+      "name": "System",
+      "items": [
+        {
+          "name": "DNF upgrade",
+          "check": "test -f /var/lib/fedora-postinstall-checklist/dnf-upgrade.done",
+          "install": "sudo dnf upgrade --refresh -y && sudo mkdir -p /var/lib/fedora-postinstall-checklist && echo done | sudo tee /var/lib/fedora-postinstall-checklist/dnf-upgrade.done",
+          "notes": "Runs a full package upgrade once and records a local marker."
+        },
+        {
+          "name": "RPM Fusion free",
+          "check": "rpm -q rpmfusion-free-release",
+          "install": "sudo dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm"
+        },
+        {
+          "name": "RPM Fusion nonfree",
+          "check": "rpm -q rpmfusion-nonfree-release",
+          "install": "sudo dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm"
+        },
+        {
+          "name": "Flatpak",
+          "check": "command -v flatpak",
+          "install": "sudo dnf install -y flatpak"
+        },
+        {
+          "name": "Flathub remote",
+          "check": "flatpak remotes --columns=name | grep -qx flathub",
+          "install": "flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"
+        }
+      ]
+    },
+    {
+      "name": "Daily Apps",
+      "items": [
+        {
+          "name": "Firefox",
+          "check": "command -v firefox",
+          "install": "sudo dnf install -y firefox"
+        },
+        {
+          "name": "Chromium",
+          "check": "command -v chromium-browser || command -v chromium",
+          "install": "sudo dnf install -y chromium"
+        },
+        {
+          "name": "Discord",
+          "check": "flatpak list --app --columns=application | grep -qx com.discordapp.Discord",
+          "install": "flatpak install -y flathub com.discordapp.Discord"
+        },
+        {
+          "name": "Spotify",
+          "check": "flatpak list --app --columns=application | grep -qx com.spotify.Client",
+          "install": "flatpak install -y flathub com.spotify.Client"
+        },
+        {
+          "name": "VLC",
+          "check": "command -v vlc",
+          "install": "sudo dnf install -y vlc"
+        }
+      ]
+    },
+    {
+      "name": "Development",
+      "items": [
+        {
+          "name": "Git",
+          "check": "command -v git",
+          "install": "sudo dnf install -y git"
+        },
+        {
+          "name": "GitHub CLI",
+          "check": "command -v gh",
+          "install": "sudo dnf install -y gh"
+        },
+        {
+          "name": "Neovim",
+          "check": "command -v nvim",
+          "install": "sudo dnf install -y neovim"
+        },
+        {
+          "name": "Visual Studio Code",
+          "check": "command -v code",
+          "install": "sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc && printf '[code]\\nname=Visual Studio Code\\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\\nenabled=1\\nautorefresh=1\\ntype=rpm-md\\ngpgcheck=1\\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc\\n' | sudo tee /etc/yum.repos.d/vscode.repo && sudo dnf install -y code"
+        },
+        {
+          "name": "Node.js",
+          "check": "command -v node",
+          "install": "sudo dnf install -y nodejs npm"
+        },
+        {
+          "name": "Python tooling",
+          "check": "command -v python3 && command -v pip3",
+          "install": "sudo dnf install -y python3 python3-pip python3-virtualenv pipx"
+        },
+        {
+          "name": "Docker",
+          "check": "command -v docker",
+          "install": "sudo dnf install -y docker-cli moby-engine docker-compose-plugin && sudo systemctl enable --now docker"
+        }
+      ]
+    },
+    {
+      "name": "Shell And Utilities",
+      "items": [
+        {
+          "name": "Zsh",
+          "check": "command -v zsh",
+          "install": "sudo dnf install -y zsh"
+        },
+        {
+          "name": "tmux",
+          "check": "command -v tmux",
+          "install": "sudo dnf install -y tmux"
+        },
+        {
+          "name": "ripgrep",
+          "check": "command -v rg",
+          "install": "sudo dnf install -y ripgrep"
+        },
+        {
+          "name": "fd",
+          "check": "command -v fdfind || command -v fd",
+          "install": "sudo dnf install -y fd-find"
+        },
+        {
+          "name": "bat",
+          "check": "command -v bat",
+          "install": "sudo dnf install -y bat"
+        },
+        {
+          "name": "fzf",
+          "check": "command -v fzf",
+          "install": "sudo dnf install -y fzf"
+        },
+        {
+          "name": "htop",
+          "check": "command -v htop",
+          "install": "sudo dnf install -y htop"
+        },
+        {
+          "name": "btop",
+          "check": "command -v btop",
+          "install": "sudo dnf install -y btop"
+        }
+      ]
+    },
+    {
+      "name": "Media And Fonts",
+      "items": [
+        {
+          "name": "Multimedia codecs",
+          "check": "rpm -q ffmpeg",
+          "install": "sudo dnf swap -y ffmpeg-free ffmpeg --allowerasing && sudo dnf group upgrade -y multimedia"
+        },
+        {
+          "name": "ImageMagick",
+          "check": "command -v magick || command -v convert",
+          "install": "sudo dnf install -y ImageMagick"
+        },
+        {
+          "name": "GIMP",
+          "check": "command -v gimp",
+          "install": "sudo dnf install -y gimp"
+        },
+        {
+          "name": "Noto fonts",
+          "check": "rpm -q google-noto-sans-fonts",
+          "install": "sudo dnf install -y google-noto-sans-fonts google-noto-emoji-fonts"
+        },
+        {
+          "name": "JetBrains Mono",
+          "check": "rpm -q jetbrains-mono-fonts-all",
+          "install": "sudo dnf install -y jetbrains-mono-fonts-all"
+        }
+      ]
+    }
+  ]
+}

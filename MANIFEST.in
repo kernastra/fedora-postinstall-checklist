@@ -1,0 +1,2 @@
+include checklist.json
+include fedora_checklist/checklist.json
