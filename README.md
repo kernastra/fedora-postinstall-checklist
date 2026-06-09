@@ -110,17 +110,36 @@ Included by default:
 
 - Firefox, LibreWolf, Discord, Steam, Obsidian, and 1Password.
 - Claude Code CLI, Codex CLI, Ollama, Hermes Agent, Higgsfield MCP CLI, GitHub CLI, Supabase CLI, Vercel CLI, and Docker.
-- Fedora setup basics, shell utilities, codecs, and fonts.
+- Fedora setup basics, Intel Arc Pro B60 support packages, shell utilities, codecs, and fonts.
 
 Skipped by default, but still visible so you can include them with Space:
 
 - PAI Agent, because the requested package name is ambiguous. The current candidate is `paintress-cli`, which is built on `pai-agent-sdk`.
 - Spotify, VLC, Neovim, and Visual Studio Code from the starter checklist.
+- Intel Arc Pro B60 hardware verifiers. Include these after the B60 is physically installed.
 
 Not included:
 
 - Chromium and GIMP were removed.
 - Linear does not currently publish a Linux desktop app. Use Linear in a supported browser or install it as a browser PWA.
+
+## Intel Arc Pro B60
+
+The checklist installs Fedora's current Intel Arc support packages by default:
+
+- `linux-firmware`
+- Mesa OpenGL/Vulkan packages
+- `libva-utils` and `libva-intel-media-driver`
+- `intel-gpu-tools`
+- `intel-compute-runtime` and `clinfo`
+
+The B60 verification items are skipped by default so the full install run does not fail before the physical GPU is installed. After the card is in the machine, include those verifier items with Space or run:
+
+```bash
+fedora-checklist --check
+```
+
+Also enable Resizable BAR or Smart Access Memory, Above 4G Decoding if your BIOS requires it, and UEFI boot mode.
 
 ## License
 

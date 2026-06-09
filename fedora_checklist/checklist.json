@@ -99,6 +99,63 @@
       ]
     },
     {
+      "name": "Intel Arc Pro B60 GPU",
+      "items": [
+        {
+          "name": "B60 driver and tooling packages",
+          "id": "intel-arc-b60-packages",
+          "check": "rpm -q linux-firmware mesa-dri-drivers mesa-vulkan-drivers vulkan-tools libva-utils libva-intel-media-driver intel-gpu-tools intel-compute-runtime clinfo",
+          "install": "sudo dnf upgrade --refresh -y && sudo dnf install -y linux-firmware mesa-dri-drivers mesa-vulkan-drivers vulkan-tools libva-utils libva-intel-media-driver intel-gpu-tools intel-compute-runtime clinfo",
+          "notes": "Installs Fedora's current firmware, Mesa/Vulkan, VA-API, Intel GPU tools, and OpenCL/Level Zero compute runtime."
+        },
+        {
+          "name": "B60 hardware detected",
+          "id": "intel-arc-b60-detected",
+          "check": "lspci -nn | grep -Ei 'Arc Pro B60|\\bB60\\b|Battlemage'",
+          "install": "lspci -nnk | grep -A4 -Ei 'Arc Pro B60|\\bB60\\b|Battlemage'",
+          "selected": false,
+          "depends_on": ["intel-arc-b60-packages"],
+          "notes": "Run after installing the physical GPU. If this fails, reseat the card, check power cables, BIOS PCIe settings, and UEFI mode."
+        },
+        {
+          "name": "B60 kernel driver active",
+          "id": "intel-arc-b60-kernel-driver",
+          "check": "lspci -nnk | grep -A4 -Ei 'Arc Pro B60|\\bB60\\b|Battlemage' | grep -Eq 'Kernel driver in use: (xe|i915)'",
+          "install": "lspci -nnk | grep -A4 -Ei 'Arc Pro B60|\\bB60\\b|Battlemage'",
+          "selected": false,
+          "depends_on": ["intel-arc-b60-detected"],
+          "notes": "Recent Intel Arc GPUs normally use the in-kernel xe driver, though some Arc paths may still report i915."
+        },
+        {
+          "name": "B60 Vulkan working",
+          "id": "intel-arc-b60-vulkan",
+          "check": "vulkaninfo --summary 2>/dev/null | grep -Ei 'Intel|Arc|Battlemage|B60'",
+          "install": "vulkaninfo --summary",
+          "selected": false,
+          "depends_on": ["intel-arc-b60-packages"],
+          "notes": "Confirms Mesa Vulkan can see an Intel/Arc GPU."
+        },
+        {
+          "name": "B60 VA-API media working",
+          "id": "intel-arc-b60-vaapi",
+          "check": "vainfo 2>/dev/null | grep -Eq 'VAProfile|Driver version|Intel|iHD'",
+          "install": "vainfo",
+          "selected": false,
+          "depends_on": ["intel-arc-b60-packages"],
+          "notes": "Confirms video acceleration is available through VA-API."
+        },
+        {
+          "name": "B60 OpenCL compute working",
+          "id": "intel-arc-b60-opencl",
+          "check": "clinfo 2>/dev/null | grep -Ei 'Intel.*(Graphics|Arc|GPU)|Level Zero|OpenCL'",
+          "install": "clinfo | sed -n '1,120p'",
+          "selected": false,
+          "depends_on": ["intel-arc-b60-packages"],
+          "notes": "Confirms Intel compute runtime is visible to OpenCL/Level Zero tooling."
+        }
+      ]
+    },
+    {
       "name": "AI And Agent Tools",
       "items": [
         {
