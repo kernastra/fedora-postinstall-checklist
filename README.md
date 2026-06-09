@@ -104,6 +104,24 @@ To remove an app from your setup permanently, delete its object from `checklist.
 
 The default checklist includes RPM Fusion, Flathub, common developer tools, media apps, codecs, and fonts. Install runs are dependency-aware: Flatpak apps wait for Flathub, and multimedia codecs wait for RPM Fusion.
 
+## Current Personal App Set
+
+Included by default:
+
+- Firefox, LibreWolf, Discord, Steam, Obsidian, and 1Password.
+- Claude Code CLI, Codex CLI, Ollama, Hermes Agent, Higgsfield MCP CLI, GitHub CLI, Supabase CLI, Vercel CLI, and Docker.
+- Fedora setup basics, shell utilities, codecs, and fonts.
+
+Skipped by default, but still visible so you can include them with Space:
+
+- PAI Agent, because the requested package name is ambiguous. The current candidate is `paintress-cli`, which is built on `pai-agent-sdk`.
+- Spotify, VLC, Neovim, and Visual Studio Code from the starter checklist.
+
+Not included:
+
+- Chromium and GIMP were removed.
+- Linear does not currently publish a Linux desktop app. Use Linear in a supported browser or install it as a browser PWA.
+
 ## License
 
 MIT

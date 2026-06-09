@@ -31,6 +31,7 @@ class ChecklistItem:
     group: str
     notes: str = ""
     selected: bool = True
+    default_selected: bool = True
     depends_on: list[str] = field(default_factory=list)
     installed: bool = False
     manual_done: bool = False
@@ -49,6 +50,7 @@ class ChecklistItem:
 class PersistedState:
     manual_done: set[str] = field(default_factory=set)
     skipped: set[str] = field(default_factory=set)
+    included: set[str] = field(default_factory=set)
 
 
 @dataclass
@@ -89,6 +91,7 @@ def load_config(path: Path) -> list[ChecklistItem]:
                     install=item["install"],
                     notes=item.get("notes", ""),
                     selected=item.get("selected", True),
+                    default_selected=item.get("selected", True),
                     depends_on=item.get("depends_on", []),
                     group=group_name,
                 )
@@ -115,6 +118,7 @@ def load_state() -> PersistedState:
         return PersistedState(
             manual_done=set(data.get("manual_done", [])),
             skipped=set(data.get("skipped", [])),
+            included=set(data.get("included", [])),
         )
     except (OSError, json.JSONDecodeError):
         return PersistedState()
@@ -127,6 +131,7 @@ def save_state(state: PersistedState) -> None:
             {
                 "manual_done": sorted(state.manual_done),
                 "skipped": sorted(state.skipped),
+                "included": sorted(state.included),
             },
             file,
             indent=2,
@@ -155,7 +160,7 @@ def scan_items(items: list[ChecklistItem], persisted: PersistedState) -> None:
         result = run_shell(item.check)
         item.installed = result.returncode == 0
         item.manual_done = item.id in persisted.manual_done
-        item.selected = item.id not in persisted.skipped
+        item.selected = (item.default_selected or item.id in persisted.included) and item.id not in persisted.skipped
         item.last_error = "" if item.installed else (result.stderr or result.stdout).strip()
 
 
@@ -379,10 +384,12 @@ def tui(stdscr: Any, items: list[ChecklistItem], persisted: PersistedState) -> N
             item = state.items[state.selected_index]
             if item.id in state.persisted.skipped:
                 state.persisted.skipped.remove(item.id)
+                state.persisted.included.add(item.id)
                 item.selected = True
                 state.message = f"Included {item.name} in install runs."
             else:
                 state.persisted.skipped.add(item.id)
+                state.persisted.included.discard(item.id)
                 item.selected = False
                 state.message = f"Skipped {item.name}."
             save_state(state.persisted)

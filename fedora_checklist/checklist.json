@@ -38,7 +38,7 @@
       ]
     },
     {
-      "name": "Daily Apps",
+      "name": "Browsers And Desktop Apps",
       "items": [
         {
           "name": "Firefox",
@@ -47,10 +47,10 @@
           "install": "sudo dnf install -y firefox"
         },
         {
-          "name": "Chromium",
-          "id": "chromium",
-          "check": "command -v chromium-browser || command -v chromium",
-          "install": "sudo dnf install -y chromium"
+          "name": "LibreWolf",
+          "id": "librewolf",
+          "check": "command -v librewolf",
+          "install": "sudo dnf config-manager addrepo --from-repofile=https://repo.librewolf.net/librewolf.repo && sudo dnf install -y librewolf"
         },
         {
           "name": "Discord",
@@ -60,17 +60,102 @@
           "depends_on": ["flathub"]
         },
         {
+          "name": "Steam",
+          "id": "steam",
+          "check": "command -v steam",
+          "install": "sudo dnf install -y steam",
+          "depends_on": ["rpm-fusion-nonfree"]
+        },
+        {
+          "name": "Obsidian",
+          "id": "obsidian",
+          "check": "flatpak list --app --columns=application | grep -qx md.obsidian.Obsidian",
+          "install": "flatpak install -y flathub md.obsidian.Obsidian",
+          "depends_on": ["flathub"]
+        },
+        {
+          "name": "1Password",
+          "id": "1password",
+          "check": "command -v 1password",
+          "install": "sudo rpm --import https://downloads.1password.com/linux/keys/1password.asc && sudo sh -c 'printf \"[1password]\\nname=1Password Stable Channel\\nbaseurl=https://downloads.1password.com/linux/rpm/stable/\\$basearch\\nenabled=1\\ngpgcheck=1\\nrepo_gpgcheck=1\\ngpgkey=\\\"https://downloads.1password.com/linux/keys/1password.asc\\\"\\n\" > /etc/yum.repos.d/1password.repo' && sudo dnf install -y 1password"
+        },
+        {
           "name": "Spotify",
           "id": "spotify",
           "check": "flatpak list --app --columns=application | grep -qx com.spotify.Client",
           "install": "flatpak install -y flathub com.spotify.Client",
-          "depends_on": ["flathub"]
+          "selected": false,
+          "depends_on": ["flathub"],
+          "notes": "Kept visible from the original list, but skipped by default."
         },
         {
           "name": "VLC",
           "id": "vlc",
           "check": "command -v vlc",
-          "install": "sudo dnf install -y vlc"
+          "install": "sudo dnf install -y vlc",
+          "selected": false,
+          "notes": "Kept visible from the original list, but skipped by default."
+        }
+      ]
+    },
+    {
+      "name": "AI And Agent Tools",
+      "items": [
+        {
+          "name": "Claude Code CLI",
+          "id": "claude-code-cli",
+          "check": "command -v claude",
+          "install": "sudo npm install -g @anthropic-ai/claude-code",
+          "depends_on": ["nodejs"],
+          "notes": "Authenticate after install with claude."
+        },
+        {
+          "name": "Codex CLI",
+          "id": "codex-cli",
+          "check": "command -v codex",
+          "install": "sudo npm install -g @openai/codex",
+          "depends_on": ["nodejs"],
+          "notes": "Authenticate after install with codex."
+        },
+        {
+          "name": "PAI Agent",
+          "id": "pai-agent",
+          "check": "command -v paintress-cli",
+          "install": "pipx install paintress-cli",
+          "depends_on": ["python-tooling"],
+          "selected": false,
+          "notes": "Tentative: this uses the PAI Agent SDK TUI package. Include it after confirming this is the PAI you mean."
+        },
+        {
+          "name": "Ollama",
+          "id": "ollama",
+          "check": "command -v ollama",
+          "install": "curl -fsSL https://ollama.com/install.sh | sh",
+          "notes": "After install, run ollama pull <model> for the local models you want."
+        },
+        {
+          "name": "Hermes Agent CLI",
+          "id": "hermes-agent-cli",
+          "check": "command -v hermes || test -x \"$HOME/.local/bin/hermes\"",
+          "install": "curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash",
+          "depends_on": ["git"],
+          "notes": "Reload your shell after install if hermes is not immediately on PATH."
+        },
+        {
+          "name": "Hermes Desktop",
+          "id": "hermes-desktop",
+          "check": "test -d \"$HOME/.hermes\" && (command -v hermes || test -x \"$HOME/.local/bin/hermes\")",
+          "install": "PATH=\"$HOME/.local/bin:$PATH\" hermes desktop",
+          "depends_on": ["hermes-agent-cli"],
+          "notes": "This launches the Hermes desktop installer/runner from the CLI."
+        },
+        {
+          "name": "Higgsfield MCP CLI",
+          "id": "higgsfield-mcp-cli",
+          "check": "command -v higgsfield",
+          "install": "sudo npm install -g @higgsfield/cli",
+          "depends_on": ["nodejs"],
+          "notes": "After install, run higgsfield auth login and connect https://mcp.higgsfield.ai/mcp in your MCP client."
         }
       ]
     },
@@ -90,27 +175,46 @@
           "install": "sudo dnf install -y gh"
         },
         {
+          "name": "Supabase CLI",
+          "id": "supabase-cli",
+          "check": "command -v supabase",
+          "install": "arch=$(uname -m); case \"$arch\" in x86_64) asset=supabase_linux_amd64.tar.gz ;; aarch64|arm64) asset=supabase_linux_arm64.tar.gz ;; *) echo \"Unsupported architecture: $arch\"; exit 1 ;; esac; tmpdir=$(mktemp -d) && curl -fL \"https://github.com/supabase/cli/releases/latest/download/$asset\" -o \"$tmpdir/supabase.tar.gz\" && tar -xzf \"$tmpdir/supabase.tar.gz\" -C \"$tmpdir\" && bin=$(find \"$tmpdir\" -type f -name supabase | head -n 1) && test -n \"$bin\" && sudo install \"$bin\" /usr/local/bin/supabase",
+          "depends_on": ["docker"],
+          "notes": "Uses the standalone Linux amd64 release because Supabase does not support npm -g installs."
+        },
+        {
+          "name": "Vercel CLI",
+          "id": "vercel-cli",
+          "check": "command -v vercel",
+          "install": "sudo npm install -g vercel",
+          "depends_on": ["nodejs"]
+        },
+        {
           "name": "Neovim",
           "id": "neovim",
           "check": "command -v nvim",
-          "install": "sudo dnf install -y neovim"
+          "install": "sudo dnf install -y neovim",
+          "selected": false,
+          "notes": "Kept visible from the original list, but skipped by default."
         },
         {
           "name": "Visual Studio Code",
           "id": "visual-studio-code",
           "check": "command -v code",
-          "install": "sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc && printf '[code]\\nname=Visual Studio Code\\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\\nenabled=1\\nautorefresh=1\\ntype=rpm-md\\ngpgcheck=1\\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc\\n' | sudo tee /etc/yum.repos.d/vscode.repo && sudo dnf install -y code"
+          "install": "sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc && printf '[code]\\nname=Visual Studio Code\\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\\nenabled=1\\nautorefresh=1\\ntype=rpm-md\\ngpgcheck=1\\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc\\n' | sudo tee /etc/yum.repos.d/vscode.repo && sudo dnf install -y code",
+          "selected": false,
+          "notes": "Kept visible from the original list, but skipped by default."
         },
         {
           "name": "Node.js",
           "id": "nodejs",
-          "check": "command -v node",
+          "check": "command -v node && command -v npm",
           "install": "sudo dnf install -y nodejs npm"
         },
         {
           "name": "Python tooling",
           "id": "python-tooling",
-          "check": "command -v python3 && command -v pip3",
+          "check": "command -v python3 && command -v pip3 && command -v pipx",
           "install": "sudo dnf install -y python3 python3-pip python3-virtualenv pipx"
         },
         {
@@ -189,12 +293,6 @@
           "id": "imagemagick",
           "check": "command -v magick || command -v convert",
           "install": "sudo dnf install -y ImageMagick"
-        },
-        {
-          "name": "GIMP",
-          "id": "gimp",
-          "check": "command -v gimp",
-          "install": "sudo dnf install -y gimp"
         },
         {
           "name": "Noto fonts",

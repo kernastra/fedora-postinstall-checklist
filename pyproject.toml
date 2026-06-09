@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fedora-postinstall-checklist"
-version = "0.2.0"
+version = "0.3.0"
 description = "Interactive TUI checklist for setting up a fresh Fedora Linux install."
 readme = "README.md"
 requires-python = ">=3.11"
